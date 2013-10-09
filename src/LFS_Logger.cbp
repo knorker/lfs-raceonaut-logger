@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="LFS_Logger" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/LFS_logger" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="0" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="C:/program1/LFSinsim/src/" />
+				</Compiler>
+				<Linker>
+					<Add library="wsock32" />
+					<Add directory="C:/program1/LFSinsim/src/" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Event Control" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="localhost 29999 pckforever" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="wsock32" />
+					<Add library="C:\program1\LFSinsim\src\libpthreadGC2.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add library="wsock32" />
+			<Add library="C:\Program Files (x86)\CodeBlocks\MinGW\lib\libpthreadGC2.a" />
+		</Linker>
+		<Unit filename="cinsim.cpp" />
+		<Unit filename="cinsim.h" />
+		<Unit filename="insim.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

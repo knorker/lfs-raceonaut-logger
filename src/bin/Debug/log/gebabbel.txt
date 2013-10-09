@@ -1,0 +1,30 @@
+^1[GRT]^3LRK-racer ^s1 --- > 50
+^7MTDZX^2-^9Antti^s1 --- > 47
+^1[CR]^7Bandes^s2 --- > 45
+^0[^7MR^0c] ^7mux^s4 --- > 10
+^2THR ^3Daniel ^s1 --- > 41
+^6Cruel ^7Garfield^0^s2 --- > 63
+^7ERR^0^v ^1Jamo ^3^s2 --- > 69
+^0[^7MR^0c] ^7Michal^s3 --- > 71
+^1MZR^7toberkel^s2 --- > 67
+^3[A-D] ^7Badger^9^s4 --- > 18
+^7ERR^0^v^JÒ^1nyle^3^s2 --- > 53
+^1MZR ^7Kelle^s3 --- > 30
+^1Aku^7Lambat^s2 --- > 56
+^0T©L ^1Knistling^4^s3 --- > 29
+^6Bingo ^7Wings^0^s3 --- > 26
+^0[^4RfB^0]^7alex^s3 --- > 42
+^7Mond^5brot^9^s4 --- > 68
+^4BHA^2tmack^s3 --- > 43
+^0T©L ^1Gut^3holz^7^s3 --- > 13
+^7R.Tuusis^9^s4 --- > 65
+Camoradi^s2 --- > 1
+^0[^7MR^0c] ^7mux^s4 --- > 73
+153 587
+180 600
+157 219
+-215 196
+-219 190
+-222 183
+-170 725
+-219 190
