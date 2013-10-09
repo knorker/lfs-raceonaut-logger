@@ -57,7 +57,28 @@ i=0
 
 n=22 (or how many cars there are)
 
+4.1b) NOTE: if you only want to plot one car, set i and n to same number, like:
+i=5 
+
+n=5
+
 load 'playerspeedcolor.p'
 
 4.2) See gebabbel.txt to find out which plotXY.png belongs to which driver.
 (for example plot12.png = Gutholz etc)
+
+
+===Adjusting plot script for track===
+The plot scripts must be adjusted for each track:
+
+1) The track image must be the correct one, for example KY.png for Kyoto etc.
+
+The ranges must be set so that the track is centered etc.
+For example for Kyoto National:
+
+set yrange [-250:950]
+set xrange [-850:600]
+
+See file "gnuplot nlotes.txt" for ranges for some other tracks.
+
+Other .p are various other plot files with some examples or hints, maybe.
