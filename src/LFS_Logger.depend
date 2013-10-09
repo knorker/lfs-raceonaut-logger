@@ -1,0 +1,69 @@
+# depslib dependency file v1.0
+1378265958 source:c:\program1\lfsinsim\src\cinsim.cpp
+	"cinsim.h"
+
+1378265958 c:\program1\lfsinsim\src\cinsim.h
+	"insim.h"
+	<winsock2.h>
+	<stdio.h>
+	<string.h>
+	"pthread.h"
+	<stdio.h>
+	<pthread.h>
+	<limits.h>
+	<string.h>
+	<netdb.h>
+	<sys/types.h>
+	<netinet/in.h>
+	<sys/socket.h>
+	<arpa/inet.h>
+	<fstream>
+	<unistd.h>
+
+1378265958 c:\program1\lfsinsim\src\insim.h
+
+1378266527 c:\program1\lfsinsim\src\pthread.h
+	<windows.h>
+	"config.h"
+	<time.h>
+	<signal.h>
+	<setjmp.h>
+	<limits.h>
+	"need_errno.h"
+	<errno.h>
+	"sched.h"
+	<sys/types.h>
+
+1378266515 c:\program1\lfsinsim\src\sched.h
+	"need_errno.h"
+	<errno.h>
+	<sys/types.h>
+	<time.h>
+
+1378266527 c:\program1\lfsinsim\src\\pthread.h
+	<windows.h>
+	"config.h"
+	<time.h>
+	<signal.h>
+	<setjmp.h>
+	<limits.h>
+	"need_errno.h"
+	<errno.h>
+	"sched.h"
+	<sys/types.h>
+
+1378266515 c:\program1\lfsinsim\src\\sched.h
+	"need_errno.h"
+	<errno.h>
+	<sys/types.h>
+	<time.h>
+
+1380768517 source:c:\program1\lfsinsim\src\main.cpp
+	<iostream>
+	<fstream>
+	"pthread.h"
+	"CInsim.h"
+	<string>
+	<sstream>
+	<stdexcept>
+
