@@ -1,0 +1,63 @@
+#summary how to use the LFS-RaceOnaut-Logger
+
+= Introduction =
+
+Written in a hurry, if wished will improve the text a bit later.
+This explains how to log car positions,speed,... into text files and then use gnuplot to create graphics from that.
+
+
+==Logging==
+
+1) Start the replay and pause it.
+
+2) In timeline, click the button to jump to start of replay.
+
+Now LFS should show a black screen and blinking "Pause" text.
+
+3) Type into chat:
+
+/insim 29999
+
+4) Start LFS_Logger.exe
+
+It should now look something like this, the program listing all racers from the start grid:
+
+http://lfs-raceonaut-logger.googlecode.com/svn/wiki/images/how_to_start.png
+
+5) Start playback of replay
+The program should spam various messages that can be ignored.
+
+http://lfs-raceonaut-logger.googlecode.com/svn/wiki/images/in_progress.png
+
+The ******* are just to tell that the connection is still alive and the program is still working.
+
+Do not set replay speed too high.
+
+6) In log\ and log\playerlogs\ folder the program should start creating .txt files.
+
+7) When race has ended, close the program by clicking the [x] or CTRL+C
+
+==Plotting==
+1) Now plot the data. For example with free software. gnuplot: http://www.gnuplot.info/
+
+2) Commands:
+cd 'c:\blub\bla\'
+
+To change directory to the folder where log\ folder is.
+
+3) load 'speedcolor.p'
+
+Creates the graphic with all cars plotted into one image
+
+4) Indiviual cars:
+
+4.1) Type:
+
+i=0
+
+n=22 (or how many cars there are)
+
+load 'playerspeedcolor.p'
+
+4.2) See gebabbel.txt to find out which plotXY.png belongs to which driver.
+(for example plot12.png = Gutholz etc)
