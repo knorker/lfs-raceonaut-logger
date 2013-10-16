@@ -23,6 +23,7 @@ struct Car {
     std::string drivername;
 //    byte playerID;
     bool logfile_open;
+    bool stillRacing;
     std::ofstream logfile;
     int number; //fortlaufende nummerierung (für dateinamen des logfiles)
 };
@@ -97,10 +98,14 @@ void mci_message ()
             }
         //std::cout<<"["<< i << "] playerID:" << playerid << " speed: " << speed << std::endl;
         //output << makeSVGCircle (posX, posY, 1, "#000000") << std::endl;
-        if (lap <= raceLaps)
+        if (cars[playerid].stillRacing) //(lap <= raceLaps)
             {
             output << posX << " " << posY << " " << speed<< " " << position_difference << " " << lap << std::endl;
             log_per_player (playerid,  posX,  posY,  speed,  position_difference, lap);
+            }
+            else
+            {
+            std::cout <<"F";
             }
     }
 }
@@ -147,6 +152,7 @@ void npl_message ()
     std::cout << "(NPL) player joined race:" << snickname << "playerID:" << (int)playerID << std::endl;
     cars[playerID].drivername = snickname;
     cars[playerID].number = highestNumber;
+    cars[playerID].stillRacing = true;
     if (!cars[playerID].logfile_open)
     {
         std::string s = "log\\playerlogs\\log"+ntos(highestNumber)+".txt";
@@ -156,6 +162,16 @@ void npl_message ()
         babbler << snickname << " --- > " << (int)playerID<<std::endl;
     }
     highestNumber++;
+}
+
+//player finished race, car will not anymore
+void fin_message ()
+{
+    struct IS_FIN* nplPacket = (struct IS_FIN*)insim.get_packet();
+    byte playerID;
+    playerID = nplPacket->PLID;
+    std::cout << playerIDtoNickname (playerID) << " has finished racing"<<std::endl;
+    cars[playerID].stillRacing = false;
 }
 
 void ncn_message ()
@@ -291,6 +307,12 @@ int main(int argc, char* argv[])
             std::cout<<"IS_STA (state)"<<std::endl;
             state_message ();
         }
+
+        if (packetType == ISP_FIN) //racer finished race
+        {
+            fin_message();
+        }
+
     }
     return 0;
 }
