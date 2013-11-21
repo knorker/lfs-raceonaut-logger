@@ -1,5 +1,7 @@
 #summary how to use the LFS-RaceOnaut-Logger
 
+http://lfs-raceonaut-logger.googlecode.com/svn/wiki/images/raceonaut_logo22mka1.jpg
+
 = Introduction =
 
 Written in a hurry, if wished will improve the text a bit later.
