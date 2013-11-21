@@ -1,5 +1,13 @@
 #summary how to use the LFS-RaceOnaut-Logger
 
+Examples:
+
+https://www.lfsforum.net/showthread.php?p=1828231#post1828231
+
+https://www.lfsforum.net/showthread.php?p=1826202#post1826202
+
+https://www.lfsforum.net/showthread.php?p=1825693#post1825693
+
 http://lfs-raceonaut-logger.googlecode.com/svn/wiki/images/raceonaut_logo22mka1.jpg
 
 = Introduction =
