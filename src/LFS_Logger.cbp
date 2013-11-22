@@ -35,7 +35,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add library="wsock32" />
-					<Add library="C:\program1\LFSinsim\src\libpthreadGC2.a" />
+					<Add library="C:\program1\LFS_raceonaut-logger\src\libpthreadGC2.a" />
 				</Linker>
 			</Target>
 		</Build>

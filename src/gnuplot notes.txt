@@ -23,6 +23,10 @@ AU 8x drag:
 set yrange [-300:700]
 set xrange [-500:500]
 
+Fernbay linker teil (FE 22 oder so)
+set yrange [-770:620]
+set xrange [-750:600]
+
 
 plot "c:\\test.txt" using 1:2 with points pt 6
 
