@@ -8,6 +8,7 @@
 
 //functions---------
 void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap);
+std::string removeColorCodes (std::string s);
 //------------------
 #define MAXPLAYERID 256 //FIXME: use map, vector or something
 
@@ -21,10 +22,12 @@ std::string playerIDtoNickname (byte playerID);
 int highestNumber =0; //fuer nummerierung im Car struct
 struct Car {
     std::string drivername;
+    std::string carname;
 //    byte playerID;
     bool logfile_open;
     bool stillRacing;
     std::ofstream logfile;
+    int carContactCounter;
     int number; //fortlaufende nummerierung (für dateinamen des logfiles)
 };
 Car cars[255]; //indexed [playerID]   //FIXME: use map, vector or something
@@ -123,6 +126,8 @@ void collision_message ()
     collisionCoordinates<<  collisionPacket->A.X  / 16<< " " << collisionPacket->A.Y / 16 << "\n" << collisionPacket->B.X  / 16<< " " << collisionPacket->B.Y  / 16<< std::endl;
     //output << makeSVGCircle (-collisionPacket->A.X / 16, collisionPacket->A.Y / 16, 3, "#ff0000") << std::endl;
     //output << makeSVGCircle (-collisionPacket->B.X / 16, collisionPacket->B.Y / 16, 3, "#ff00ff") << std::endl;
+    cars[collisionPacket->A.PLID].carContactCounter ++;
+    cars[collisionPacket->B.PLID].carContactCounter ++;
 }
 
 void state_message ()
@@ -148,8 +153,12 @@ void npl_message ()
     nickname = nplPacket->PName;
     byte playerID;
     playerID = nplPacket->PLID;
+    char *ccar;
+    ccar = nplPacket->CName;
+    std::string carname = ccar;
     std::string snickname = nickname;
     std::cout << "(NPL) player joined race:" << snickname << "playerID:" << (int)playerID << std::endl;
+    snickname = removeColorCodes (snickname);
     cars[playerID].drivername = snickname;
     cars[playerID].number = highestNumber;
     cars[playerID].stillRacing = true;
@@ -158,13 +167,13 @@ void npl_message ()
         std::string s = "log\\playerlogs\\log"+ntos(highestNumber)+".txt";
         cars[playerID].logfile.open(s.c_str());
         cars[playerID].logfile_open = true;
-        cars[playerID].logfile << '\"'<< snickname << " "<< '\"' << (int)playerID<<std::endl;   //"nickname" in quotes so gnuplots reads it as whole thing instead of stopping at spaces
-        babbler << snickname << " --- > " << (int)playerID<<std::endl;
+        cars[playerID].logfile << '\"'<< snickname << " "<< "Car: "<< carname << '\"' << (int)playerID<<std::endl;   //"nickname" in quotes so gnuplots reads it as whole thing instead of stopping at spaces
+        babbler << snickname << "\t\t\t\t--- > " << (int)playerID<<std::endl;
     }
     highestNumber++;
 }
 
-//player finished race, car will not anymore
+//player finished race, car will not be logged anymore
 void fin_message ()
 {
     struct IS_FIN* nplPacket = (struct IS_FIN*)insim.get_packet();
@@ -172,6 +181,7 @@ void fin_message ()
     playerID = nplPacket->PLID;
     std::cout << playerIDtoNickname (playerID) << " has finished racing"<<std::endl;
     cars[playerID].stillRacing = false;
+    babbler << "Car contacts: " << playerIDtoNickname (playerID) << " "<< cars[playerID].carContactCounter <<std::endl;
 }
 
 void ncn_message ()
@@ -215,10 +225,34 @@ void obh_message ()
 
 }
 
+std::string removeColorCodes (std::string s)
+{
+std::string s2;
+for (int i = 0;  i < s.length();  i++)
+{
+    if ( (s[i] == '^') && ((s[i+1] >= '0' && s[i+1] <= '9')) )
+    {
+
+        i++;
+    }
+    else
+    {
+        if ( s[i] == '^' && s[i+1] =='s')
+        {
+            s2+='/';
+            i++;
+        }
+        else
+        {
+            s2+=s[i];
+        }
+    }
+}
+return s2;
+}
+
 int main(int argc, char* argv[])
 {
-    std::cout<< "started\n";
-
     int retVal = 0;
     struct IS_VER verPack;	//LFS can tell us info about it's version and InSim version, store that info in this struct.
     //Try to connect to LFS
