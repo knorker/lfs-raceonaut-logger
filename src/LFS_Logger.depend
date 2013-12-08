@@ -40,7 +40,7 @@
 	<sys/types.h>
 	<time.h>
 
-1378266527 c:\program1\lfsinsim\src\\pthread.h
+1378262927 c:\program1\lfsinsim\src\\pthread.h
 	<windows.h>
 	"config.h"
 	<time.h>
@@ -52,7 +52,7 @@
 	"sched.h"
 	<sys/types.h>
 
-1378266515 c:\program1\lfsinsim\src\\sched.h
+1378262915 c:\program1\lfsinsim\src\\sched.h
 	"need_errno.h"
 	<errno.h>
 	<sys/types.h>
@@ -67,10 +67,10 @@
 	<sstream>
 	<stdexcept>
 
-1378265958 source:c:\program1\lfs_raceonaut-logger\src\cinsim.cpp
+1378262358 source:c:\program1\lfs_raceonaut-logger\src\cinsim.cpp
 	"cinsim.h"
 
-1378265958 c:\program1\lfs_raceonaut-logger\src\cinsim.h
+1378262358 c:\program1\lfs_raceonaut-logger\src\cinsim.h
 	"insim.h"
 	<winsock2.h>
 	<stdio.h>
@@ -88,9 +88,9 @@
 	<fstream>
 	<unistd.h>
 
-1378265958 c:\program1\lfs_raceonaut-logger\src\insim.h
+1378262358 c:\program1\lfs_raceonaut-logger\src\insim.h
 
-1378266527 c:\program1\lfs_raceonaut-logger\src\pthread.h
+1378262927 c:\program1\lfs_raceonaut-logger\src\pthread.h
 	<windows.h>
 	"config.h"
 	<time.h>
@@ -102,18 +102,20 @@
 	"sched.h"
 	<sys/types.h>
 
-1378266515 c:\program1\lfs_raceonaut-logger\src\sched.h
+1378262915 c:\program1\lfs_raceonaut-logger\src\sched.h
 	"need_errno.h"
 	<errno.h>
 	<sys/types.h>
 	<time.h>
 
-1381995476 source:c:\program1\lfs_raceonaut-logger\src\main.cpp
+1386431845 source:c:\program1\lfs_raceonaut-logger\src\main.cpp
+	<iostream>
 	<iostream>
 	<fstream>
 	"pthread.h"
 	"CInsim.h"
 	<string>
+	<cmath>
 	<sstream>
 	<stdexcept>
 

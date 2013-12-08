@@ -1,34 +1,53 @@
 #include <iostream>
+#include <iostream>
 #include <fstream>
 #include "pthread.h"
 #include "CInsim.h"
 #include <string>
+#include <cmath>
 #include <sstream>
 #include <stdexcept>
 
 //functions---------
-void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap);
+void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap, float drift);
+std::string stringChain (int n, std::string s);
 std::string removeColorCodes (std::string s);
+std::string tyresString (byte tyres[]);
 //------------------
 #define MAXPLAYERID 256 //FIXME: use map, vector or something
+
+
+std::string tyreNames[] = { std::string("R1"),
+                           std::string("R2"),
+                           std::string("R3"),
+                           std::string("R4"),
+                           std::string("Road Super"),
+                           std::string("Road Normal"),
+                           std::string("Hybrid"),
+                           std::string("Knobbly"),
+                            };
 
 CInsim insim;			//CInsim object, handles the communication with LFS
 std::ofstream collisionCoordinates;
 std::ofstream output; //coordinates logging of all cars into one file "output.txt"
 std::ofstream babbler; //general messages and debug
+std::ofstream pitstops; //for logging type of tyres
 
 int raceLaps = 9999;    //how many laps this race? needed so that cars who have finished can be ignored
 std::string playerIDtoNickname (byte playerID);
 int highestNumber =0; //fuer nummerierung im Car struct
 struct Car {
     std::string drivername;
-    std::string carname;
+    std::string carname; //"XFG", "FBM" etc
 //    byte playerID;
     bool logfile_open;
     bool stillRacing;
     std::ofstream logfile;
+    std::ofstream logfileLapTimes;
+    int completedLaps;
     int carContactCounter;
     int number; //fortlaufende nummerierung (für dateinamen des logfiles)
+    std::string tyres; //"Start: R2 R2 Lap 15: R3 R3"
 };
 Car cars[255]; //indexed [playerID]   //FIXME: use map, vector or something
 
@@ -76,6 +95,26 @@ std::string makeSVGCircle (int x, int y, int r, std::string color)
     return s;
 }
 
+//direcion & heading in 0-360°
+float driftAngle (float direction, float heading)
+{
+    float absdiff = fabs(direction - heading);
+    if (absdiff <= 180.0f) return absdiff;
+    if (direction < 180)
+    {
+        heading -= 360;
+        return direction - heading;
+    }
+    else
+    {
+        direction -= 360;
+        return heading - direction;
+    }
+}
+
+
+
+
 //Multi Car Info
 void mci_message ()
 {
@@ -89,6 +128,9 @@ void mci_message ()
         int playerid = mciPacket->Info[i].PLID;
         word lap = mciPacket->Info[i].Lap;
         int position = mciPacket->Info[i].Position;
+        float heading = mciPacket->Info[i].Heading / 182.04f; // / 32768.0f*180.0f;
+        float direction = mciPacket->Info[i].Direction /182.04f; // 32768.0f*180.0f;
+
         int position_difference = 0;
         if (position != playerPosition[playerid])
             {
@@ -99,12 +141,16 @@ void mci_message ()
             }
             playerPosition[playerid] = position;
             }
+        float drift = driftAngle (direction, heading);
+
+        //std::cout<< "playerID:" << playerid << " heading: " << heading << "\tdirection: " << direction<< "\tdrift:"<<drift<<std::endl;
+
         //std::cout<<"["<< i << "] playerID:" << playerid << " speed: " << speed << std::endl;
         //output << makeSVGCircle (posX, posY, 1, "#000000") << std::endl;
         if (cars[playerid].stillRacing) //(lap <= raceLaps)
             {
-            output << posX << " " << posY << " " << speed<< " " << position_difference << " " << lap << std::endl;
-            log_per_player (playerid,  posX,  posY,  speed,  position_difference, lap);
+            output << posX << " " << posY << " " << speed<< " " << position_difference << " " << lap << " " << drift <<std::endl;
+            log_per_player (playerid,  posX,  posY,  speed,  position_difference, lap, drift);
             }
             else
             {
@@ -123,11 +169,16 @@ void collision_message ()
     //std::cout << (int) collisionPacket->Time<< std::endl;
 //    collisionCoordinates << "<circle cx=";
     //collisionCoordinates <<  collisionPacket->A.X << " cy=" << collisionPacket->A.Y << " r=10" << "/>" << std::endl;
-    collisionCoordinates<<  collisionPacket->A.X  / 16<< " " << collisionPacket->A.Y / 16 << "\n" << collisionPacket->B.X  / 16<< " " << collisionPacket->B.Y  / 16<< std::endl;
     //output << makeSVGCircle (-collisionPacket->A.X / 16, collisionPacket->A.Y / 16, 3, "#ff0000") << std::endl;
     //output << makeSVGCircle (-collisionPacket->B.X / 16, collisionPacket->B.Y / 16, 3, "#ff00ff") << std::endl;
-    cars[collisionPacket->A.PLID].carContactCounter ++;
-    cars[collisionPacket->B.PLID].carContactCounter ++;
+    if (cars[collisionPacket->A.PLID].stillRacing && cars[collisionPacket->B.PLID].stillRacing)
+        {
+        cars[collisionPacket->A.PLID].carContactCounter ++;
+        cars[collisionPacket->B.PLID].carContactCounter ++;
+        collisionCoordinates<<  collisionPacket->A.X  / 16<< " " << collisionPacket->A.Y / 16 << "\n" << collisionPacket->B.X  / 16<< " " << collisionPacket->B.Y  / 16<< std::endl;
+        }
+    babbler << "CONTACT:" << playerIDtoNickname((int) collisionPacket->A.PLID) << " <-vs-> " << playerIDtoNickname((int) collisionPacket->B.PLID) << " lap:" <<  cars [collisionPacket->A.PLID].completedLaps << std::endl;
+
 }
 
 void state_message ()
@@ -155,9 +206,17 @@ void npl_message ()
     playerID = nplPacket->PLID;
     char *ccar;
     ccar = nplPacket->CName;
+    cars[playerID].tyres = "";
+    byte *tyres;
+    tyres = nplPacket->Tyres;
+
     std::string carname = ccar;
     std::string snickname = nickname;
     std::cout << "(NPL) player joined race:" << snickname << "playerID:" << (int)playerID << std::endl;
+
+    std::cout << "start tyres: " << tyresString (tyres) << std::endl;
+    cars[playerID].tyres = "Start:" + tyresString (tyres);
+    cars[playerID].completedLaps = 0;
     snickname = removeColorCodes (snickname);
     cars[playerID].drivername = snickname;
     cars[playerID].number = highestNumber;
@@ -181,7 +240,8 @@ void fin_message ()
     playerID = nplPacket->PLID;
     std::cout << playerIDtoNickname (playerID) << " has finished racing"<<std::endl;
     cars[playerID].stillRacing = false;
-    babbler << "Car contacts: " << playerIDtoNickname (playerID) << " "<< cars[playerID].carContactCounter <<std::endl;
+    babbler << "Car contacts: " << playerIDtoNickname (playerID) << " " << stringChain (cars[playerID].carContactCounter, "(x)") << " " << cars[playerID].carContactCounter <<std::endl;
+    pitstops << playerIDtoNickname (playerID) << " tires: " << cars[playerID].tyres<<std::endl;
 }
 
 void ncn_message ()
@@ -193,9 +253,9 @@ void ncn_message ()
 }
 
 
-void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap)
+void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap, float drift)
 {
-    cars[playerID].logfile << posX << " " << posY << " " << speed<< " " << position_difference << " " << lap << std::endl;
+    cars[playerID].logfile << posX << " " << posY << " " << speed<< " " << position_difference << " " << lap << " " << drift << std::endl;
 }
 
 std::string playerIDtoNickname (byte playerID)
@@ -225,6 +285,73 @@ void obh_message ()
 
 }
 
+void lap_message ()
+{
+    struct IS_LAP* lapPacket = (struct IS_LAP*)insim.get_packet();
+    byte playerID = lapPacket->PLID;
+    unsigned LTime = lapPacket->LTime;
+    cars[playerID].completedLaps = lapPacket->LapsDone;
+}
+
+void spx_message ()
+{
+
+}
+
+void lapSplit_time_message ()
+{
+
+}
+
+void pit_message ()
+{
+    struct IS_PIT* pitPacket = (struct IS_PIT*)insim.get_packet();
+    int playerID = (int) pitPacket->PLID;
+    word lap = pitPacket->LapsDone +1;
+    byte *tyres;
+    tyres = pitPacket->Tyres;
+    //tyres[0] = (int) pitPacket->Tyres[0];
+    //tyres[1] = (int) pitPacket->Tyres[1];
+    //tyres[2] = (int) pitPacket->Tyres[2];
+    //tyres[3] = (int) pitPacket->Tyres[3];
+    //255 = not changed!
+    std::cout << "tyres[0]="  << (int) tyres[0] << std::endl;
+    std::cout << "tyres[1]="  << (int) tyres[1] << std::endl;
+    std::cout << "tyres[2]="  << (int) tyres[2] << std::endl;
+    std::cout << "tyres[3]="  << (int) tyres[3] << std::endl;
+
+/*
+    std::cout << "tyres[0]="  << tyres[0] <<" " << tyreNames [tyres[0]]<< std::endl;
+    std::cout << "tyres[1]="  << tyres[1] <<" " << tyreNames [tyres[1]]<< std::endl;
+    std::cout << "tyres[2]="  << tyres[2] <<" " << tyreNames [tyres[2]]<< std::endl;
+    std::cout << "tyres[3]="  << tyres[3] <<" " << tyreNames [tyres[3]]<< std::endl;
+*/
+    std::cout << playerIDtoNickname (playerID) << " pitted." << std::endl;
+    std::cout << "tyres after pit: " << tyresString (tyres) << std::endl;
+    cars[playerID].tyres += " Lap:" +itos (lap)+ tyresString (tyres);
+}
+
+
+std::string tyresString (byte tyres[])
+{
+       std::string s = " ";
+        int i = 4;
+        while (i!=0)
+        {
+            i--;
+            std::cout << i  << ":" << (int)tyres[i] << std::endl;
+            if (tyres[i]==NOT_CHANGED)
+            {
+                s=s+"(not changed)" + "-";
+            }
+            else
+            {
+                s+=tyreNames[(int)tyres[i]] + "-";
+            }
+           return s;
+        }
+}
+
 std::string removeColorCodes (std::string s)
 {
 std::string s2;
@@ -251,6 +378,20 @@ for (int i = 0;  i < s.length();  i++)
 return s2;
 }
 
+//stringChain (3, "ho") -> "hohoho"
+std::string stringChain (int n, std::string s)
+{
+    if (n<1) return "";
+    std::string chain;
+    int i = 0;
+    while (i < n)
+    {
+        chain+=s;
+        i++;
+    }
+return chain;
+}
+
 int main(int argc, char* argv[])
 {
     int retVal = 0;
@@ -262,7 +403,14 @@ int main(int argc, char* argv[])
               "",		//No admin password
               &verPack,		//Pointer to IS_VERSION packet
               '!',		//InSim command character
-              ISF_MCI+ISF_CON + ISF_OBH,		//what kind of packets to recieve?
+            //what kind of packets to recieve:
+              ISF_MCI+  //multi car information (positions, speed)
+              ISF_CON+ //player (dis) connecting
+              ISF_OBH+  //autocross object hit
+              ISP_LAP,
+              //ISF_PIT,
+  //            ISP_LAP+  //lap times
+  //            ISP_SPX,  //split times
               250,		//Receive updates every x msecs
               0);		//No UDP today
 
@@ -289,6 +437,7 @@ int main(int argc, char* argv[])
     collisionCoordinates.open ("log\\scollisionlog.txt");
     output.open ("log\\output.txt");
     babbler.open ("log\\gebabbel.txt");
+    pitstops.open ("log\\pitstops.txt");
 
     for(int i=0; i<MAXPLAYERID; i++)
         {
@@ -307,7 +456,7 @@ int main(int argc, char* argv[])
         //    std::cout<<packetType<<std::endl;
         if (packetType == ISP_MCI)  //multi car information
         {
-            std::cout<<"*"<<std::flush;
+            //std::cout<<"*"<<std::flush;
             mci_message ();
         }
 
@@ -342,11 +491,27 @@ int main(int argc, char* argv[])
             state_message ();
         }
 
+
+        if (packetType == ISP_LAP) //finished a lap
+        {
+            lap_message ();
+        }
+
+        if (packetType == ISP_SPX ) //crossed a split
+        {
+            spx_message ();
+        }
+
+
+        if (packetType==ISP_PIT)
+            {
+            pit_message ();
+            }
+
         if (packetType == ISP_FIN) //racer finished race
         {
             fin_message();
         }
-
     }
     return 0;
 }
