@@ -2,6 +2,13 @@ bl1:
 set yrange [-850:700]
 set xrange [-550:1000]
 
+so1:
+set yrange [-250:650]
+set xrange [-350:650]
+
+so4:
+set yrange [-650:650]
+set xrange [-800:500]
 
 ky2:
 set yrange [-250:950]
