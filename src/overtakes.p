@@ -3,6 +3,11 @@ set size ratio 1
 # set autoscale fix
 set key above autotitle columnhead
 
+load "config.p"
+set terminal png truecolor size 640,640
+set output "plot\\overtakes.png"
+
+
 #set yrange [-1300:700]
 #set xrange [-1000:1000]
 set cbrange [-9:9]
