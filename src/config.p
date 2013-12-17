@@ -1,5 +1,6 @@
-set yrange [-250:950]
-set xrange [-850:600]
-set cbrange [0:280]
+set yrange [-1000:1100]
+set xrange [-1100:1000]
+
+set cbrange [0:330]
 trackimage="KY.jpg"
-set colorbox vertical user origin 0.36, 0.45 size 0.02, 0.2
+set colorbox vertical user origin 0.5, 0.7 size 0.02, 0.2

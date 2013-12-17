@@ -10,6 +10,8 @@
 
 //functions---------
 void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap, float drift);
+void setCameraToPlayer (int playerID);
+void takeScreenshot ();
 std::string stringChain (int n, std::string s);
 std::string removeColorCodes (std::string s);
 std::string tyresString (byte tyres[]);
@@ -46,6 +48,7 @@ struct Car {
     std::ofstream logfileLapTimes;
     int completedLaps;
     int carContactCounter;
+    int objectContactCounter;
     int number; //fortlaufende nummerierung (für dateinamen des logfiles)
     std::string tyres; //"Start: R2 R2 Lap 15: R3 R3"
 };
@@ -179,6 +182,9 @@ void collision_message ()
         }
     babbler << "CONTACT:" << playerIDtoNickname((int) collisionPacket->A.PLID) << " <-vs-> " << playerIDtoNickname((int) collisionPacket->B.PLID) << " lap:" <<  cars [collisionPacket->A.PLID].completedLaps << std::endl;
 
+    setCameraToPlayer (collisionPacket->A.PLID);
+    takeScreenshot();
+
 }
 
 void state_message ()
@@ -217,6 +223,7 @@ void npl_message ()
     std::cout << "start tyres: " << tyresString (tyres) << std::endl;
     cars[playerID].tyres = "Start:" + tyresString (tyres);
     cars[playerID].completedLaps = 0;
+    cars[playerID].objectContactCounter = 0;
     snickname = removeColorCodes (snickname);
     cars[playerID].drivername = snickname;
     cars[playerID].number = highestNumber;
@@ -240,7 +247,7 @@ void fin_message ()
     playerID = nplPacket->PLID;
     std::cout << playerIDtoNickname (playerID) << " has finished racing"<<std::endl;
     cars[playerID].stillRacing = false;
-    babbler << "Car contacts: " << playerIDtoNickname (playerID) << " " << stringChain (cars[playerID].carContactCounter, "(x)") << " " << cars[playerID].carContactCounter <<std::endl;
+    babbler << "Car contacts: " << playerIDtoNickname (playerID) << " " << stringChain (cars[playerID].carContactCounter, "(st) ") << " " << cars[playerID].carContactCounter <<std::endl;
     pitstops << playerIDtoNickname (playerID) << " tires: " << cars[playerID].tyres<<std::endl;
 }
 
@@ -348,8 +355,8 @@ std::string tyresString (byte tyres[])
             {
                 s+=tyreNames[(int)tyres[i]] + "-";
             }
-           return s;
         }
+    return s;
 }
 
 std::string removeColorCodes (std::string s)
@@ -391,6 +398,36 @@ std::string stringChain (int n, std::string s)
     }
 return chain;
 }
+
+
+void setCameraToPlayer (int playerID)
+{
+    std::cout << "send IS_SCC to change camera...";
+    struct IS_SCC camera_packet;
+    memset(&camera_packet, 0, sizeof(struct IS_SCC));
+    camera_packet.Size = sizeof(struct IS_SCC);
+    camera_packet.Type = ISP_SCC;
+    camera_packet.ViewPLID = playerID;
+    camera_packet.InGameCam = 255; //255=unchanged
+    insim.send_packet(&camera_packet);
+
+}
+
+void takeScreenshot ()
+{
+    std::cout << "send IS_SSH to take screenshot...";
+    struct IS_SSH packet;
+    memset(&packet, 0, sizeof(struct IS_SSH));
+
+    packet.Size = sizeof(struct IS_SSH);
+
+    packet.Type = ISP_SSH;
+    packet.ReqI = 1;
+//    packet.BMP = "NULL";
+    insim.send_packet(&packet);
+
+}
+
 
 int main(int argc, char* argv[])
 {
