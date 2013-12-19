@@ -479,7 +479,7 @@ struct IS_MOD // MODe : send to LFS to change screen mode
 // MESSAGES OUT (FROM LFS)
 // ------------
 
-struct IS_MSO // MSg Out - system messages and user messages 
+struct IS_MSO // MSg Out - system messages and user messages
 {
 	byte	Size;		// 136
 	byte	Type;		// ISP_MSO
@@ -488,7 +488,7 @@ struct IS_MSO // MSg Out - system messages and user messages
 
 	byte	UCID;		// connection's unique id (0 = host)
 	byte	PLID;		// player's unique id (if zero, use UCID)
-	byte	UserType;	// set if typed by a user (see User Values below) 
+	byte	UserType;	// set if typed by a user (see User Values below)
 	byte	TextStart;	// first character of the actual text (after player name)
 
 	char	Msg[128];
@@ -1216,7 +1216,7 @@ enum
 
 enum
 {
-	PENALTY_NONE,		// 0		
+	PENALTY_NONE,		// 0
 	PENALTY_DT,			// 1
 	PENALTY_DT_VALID,	// 2
 	PENALTY_SG,			// 3
@@ -1459,7 +1459,7 @@ struct CarContact // 16 bytes : one car in a contact - two of these in the IS_CO
 	byte	Info;		// like Info byte in CompCar (CCI_BLUE / CCI_YELLOW / CCI_LAG)
 	byte	Sp2;		// spare
 	char	Steer;		// front wheel steer in degrees (right positive)
-	
+
 	byte	ThrBrk;		// high 4 bits : throttle    / low 4 bits : brake (0 to 15)
 	byte	CluHan;		// high 4 bits : clutch      / low 4 bits : handbrake (0 to 15)
 	byte	GearSp;		// high 4 bits : gear (15=R) / low 4 bits : spare

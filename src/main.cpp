@@ -8,6 +8,47 @@
 #include <sstream>
 #include <stdexcept>
 
+#define AXO_CONE_RED 20
+#define AXO_CONE_RED2 21
+#define AXO_CONE_RED3 22
+#define AXO_CONE_BLUE 23
+#define AXO_CONE_BLUE2 24
+#define AXO_CONE_GREEN 25
+#define AXO_CONE_GREEN2 26
+#define AXO_CONE_ORANGE 27
+#define AXO_CONE_WHITE 28
+#define AXO_CONE_YELLOW 29
+#define AXO_CONE_YELLOW2 30
+#define AXO_CONE_PTR_RED 40
+#define AXO_CONE_PTR_BLUE 41
+#define AXO_CONE_PTR_GREEN 42
+#define AXO_CONE_PTR_YELLOW 43
+#define AXO_TYRE_SINGLE 48
+#define AXO_TYRE_STACK2 49
+#define AXO_TYRE_STACK3 50
+#define AXO_TYRE_STACK4 51
+#define AXO_TYRE_SINGLE_BIG 52
+#define AXO_TYRE_STACK2_BIG 53
+#define AXO_TYRE_STACK3_BIG 54
+#define AXO_TYRE_STACK4_BIG 55
+#define AXO_POST_GREEN 136
+#define AXO_POST_ORANGE 137
+#define AXO_POST_RED 138
+#define AXO_POST_WHITE 139
+#define AXO_SPEED_HUMP_10M 128
+#define AXO_SPEED_HUMP_6M 129
+
+#define AXO_CHALK_LINE 4
+#define AXO_CHALK_LINE2 5
+#define AXO_CHALK_AHEAD 6
+#define AXO_CHALK_AHEAD2 7
+#define AXO_CHALK_LEFT 8
+#define AXO_CHALK_LEFT2 9
+#define AXO_CHALK_LEFT3 10
+#define AXO_CHALK_RIGHT 11
+#define AXO_CHALK_RIGHT2 12
+#define AXO_CHALK_RIGHT3 13
+
 //functions---------
 void log_per_player (byte playerID, float posX, float posY, float speed, int position_difference, word lap, float drift);
 void setCameraToPlayer (int playerID);
@@ -34,6 +75,7 @@ std::ofstream collisionCoordinates;
 std::ofstream output; //coordinates logging of all cars into one file "output.txt"
 std::ofstream babbler; //general messages and debug
 std::ofstream pitstops; //for logging type of tyres
+std::ofstream autocrossLayout; //coordinates of pylones, tyres etc
 
 int raceLaps = 9999;    //how many laps this race? needed so that cars who have finished can be ignored
 std::string playerIDtoNickname (byte playerID);
@@ -400,6 +442,85 @@ return chain;
 }
 
 
+void object_message ()
+{
+    struct IS_AXM * objectpacket = (struct IS_AXM*)insim.get_packet();
+    byte bNumO = objectpacket->NumO;
+    int ReqI = (int) objectpacket->ReqI;
+    int NumO = (int) bNumO;
+    std::cout << "objects:" <<  NumO;
+    std::cout << "ReqI:" << ReqI;
+//(360*Heading/256) -180= heading_in_degrees
+
+
+
+
+    ObjectInfo *info;
+    info = objectpacket->Info;
+    for (int i=0; i < NumO; i++)
+    {
+    byte bheading = info[i].Heading;
+    int heading = (360*(((float)bheading)+0.5f)/256.0f)-180; //°
+    std::cout << "heading:" << heading << "\n";
+    int objecttype = 0;
+    int objectlength = 0;
+    switch (info[i].Index)
+     {
+     //1 cones
+        case AXO_CONE_RED       :
+        case AXO_CONE_RED2      :
+        case AXO_CONE_RED3      :
+        case AXO_CONE_BLUE      :
+        case AXO_CONE_BLUE2     :
+        case AXO_CONE_GREEN     :
+        case AXO_CONE_GREEN2    :
+        case AXO_CONE_ORANGE    :
+        case AXO_CONE_WHITE     :
+        case AXO_CONE_YELLOW    :
+        case AXO_CONE_YELLOW2   :
+        case AXO_CONE_PTR_RED   :
+        case AXO_CONE_PTR_BLUE  :
+        case AXO_CONE_PTR_GREEN :
+        case AXO_CONE_PTR_YELLOW:
+        objecttype = 1;
+        break;
+        //2 tyres
+        case AXO_TYRE_SINGLE    :
+        case AXO_TYRE_STACK2    :
+        case AXO_TYRE_STACK3    :
+        case AXO_TYRE_STACK4    :
+        case AXO_TYRE_SINGLE_BIG:
+        case AXO_TYRE_STACK2_BIG:
+        case AXO_TYRE_STACK3_BIG:
+        case AXO_TYRE_STACK4_BIG:
+        objecttype = 2;
+        break;
+        //3 speed bumps
+        case AXO_SPEED_HUMP_10M:
+        objecttype = 3; objectlength = 10;
+        break;
+        case AXO_SPEED_HUMP_6M:
+        objecttype = 3; objectlength = 6;
+        break;
+        //4 chalk lines (straight)
+        case AXO_CHALK_LINE:
+        case AXO_CHALK_LINE2:
+        case AXO_CHALK_AHEAD:
+        case AXO_CHALK_AHEAD2:
+        case AXO_CHALK_LEFT3:
+        case AXO_CHALK_RIGHT3:
+        objecttype = 4; objectlength = 4;
+        break;
+        default:
+        objecttype = -1;
+        break;
+    }
+    autocrossLayout << info[i].X/16 << " " << info[i].Y /16 << " " << heading << " " << objecttype<< " " << objectlength << std::endl;
+    }
+}
+
+
+
 void setCameraToPlayer (int playerID)
 {
     std::cout << "send IS_SCC to change camera...";
@@ -444,6 +565,7 @@ int main(int argc, char* argv[])
               ISF_MCI+  //multi car information (positions, speed)
               ISF_CON+ //player (dis) connecting
               ISF_OBH+  //autocross object hit
+              ISF_AXM_LOAD+ //autocross loaded
               ISP_LAP,
               //ISF_PIT,
   //            ISP_LAP+  //lap times
@@ -461,6 +583,8 @@ int main(int argc, char* argv[])
     //All OK, report version of LFS and InSim.
     std::cout << "Its happening! Connected to LFS " << verPack.Version << ", InSim ver. " << verPack.InSimVer << std::endl;
 
+
+{
     std::cout << "send NPL request to get players...";
     struct IS_TINY pack_requests;
     memset(&pack_requests, 0, sizeof(struct IS_TINY));
@@ -470,11 +594,24 @@ int main(int argc, char* argv[])
     pack_requests.SubT = TINY_NPL;      // Request all players in-grid to know their PLID: this causes lots of IS_NPL to be sent to us
     insim.send_packet(&pack_requests);
     std::cout << "tada." << std::endl;
+}
 
+{
+    std::cout << "send SOMETHING request to get layout...";
+    struct IS_TINY pack_requests;
+    memset(&pack_requests, 0, sizeof(struct IS_TINY));
+    pack_requests.Size = sizeof(struct IS_TINY);
+    pack_requests.Type = ISP_TINY;
+    pack_requests.ReqI = 123;
+    pack_requests.SubT = TINY_AXI ;
+    insim.send_packet(&pack_requests);
+    std::cout << "tada." << std::endl;
+}
     collisionCoordinates.open ("log\\scollisionlog.txt");
     output.open ("log\\output.txt");
     babbler.open ("log\\gebabbel.txt");
     pitstops.open ("log\\pitstops.txt");
+    autocrossLayout.open ("log\\autocrosslayout.txt");
 
     for(int i=0; i<MAXPLAYERID; i++)
         {
@@ -549,6 +686,39 @@ int main(int argc, char* argv[])
         {
             fin_message();
         }
+
+        if (packetType == ISP_AXM)
+        {
+            std::cout<<"AUTOCROSS!"<<std::endl;
+            object_message();
+        }
     }
     return 0;
 }
+
+/*
+struct ObjectInfo // Info about a single object - explained in the layout file format
+{
+	short	X;
+	short	Y;
+	char	Zchar;
+	byte	Flags;
+	byte	Index;
+	byte	Heading;
+};
+
+struct IS_AXM // AutoX Multiple objects - variable size
+{
+	byte	Size;		// 8 + NumO * 8
+	byte	Type;		// ISP_AXM
+	byte	ReqI;		// 0
+	byte	NumO;		// number of objects in this packet
+
+	byte	UCID;		// unique id of the connection that sent the packet
+	byte	PMOAction;	// see below
+	byte	PMOFlags;	// see below
+	byte	Sp3;
+
+	ObjectInfo	Info[30];	// info about each object, 0 to 30 of these
+};
+*/
