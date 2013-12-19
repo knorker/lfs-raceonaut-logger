@@ -14,12 +14,12 @@ set terminal png truecolor size plotsize,plotsize  *((yrangeMax-yrangeMin)/(xran
 set output "plot\\output.png"
 
 
-set key top center autotitle columnhead
+set key above autotitle columnhead
 set key font ",10"
 
 #at top
 #set colorbox horizontal user origin 0.5, 0.94 size 0.4, 0.02
-#set cblabel "speed in km/h"
+set cblabel "speed in km/h"
 
 #set style fill transparent solid 0.5 noborder
 

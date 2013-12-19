@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1378265958 source:c:\program1\lfsinsim\src\cinsim.cpp
+1378262358 source:c:\program1\lfs_raceonaut-logger\src\cinsim.cpp
 	"cinsim.h"
 
-1378265958 c:\program1\lfsinsim\src\cinsim.h
+1378262358 c:\program1\lfs_raceonaut-logger\src\cinsim.h
 	"insim.h"
 	<winsock2.h>
 	<stdio.h>
@@ -20,9 +20,9 @@
 	<fstream>
 	<unistd.h>
 
-1378265958 c:\program1\lfsinsim\src\insim.h
+1387294201 c:\program1\lfs_raceonaut-logger\src\insim.h
 
-1378266527 c:\program1\lfsinsim\src\pthread.h
+1378262927 c:\program1\lfs_raceonaut-logger\src\pthread.h
 	<windows.h>
 	"config.h"
 	<time.h>
@@ -34,7 +34,7 @@
 	"sched.h"
 	<sys/types.h>
 
-1378266515 c:\program1\lfsinsim\src\sched.h
+1378262915 c:\program1\lfs_raceonaut-logger\src\sched.h
 	"need_errno.h"
 	<errno.h>
 	<sys/types.h>
@@ -58,57 +58,7 @@
 	<sys/types.h>
 	<time.h>
 
-1380768517 source:c:\program1\lfsinsim\src\main.cpp
-	<iostream>
-	<fstream>
-	"pthread.h"
-	"CInsim.h"
-	<string>
-	<sstream>
-	<stdexcept>
-
-1378262358 source:c:\program1\lfs_raceonaut-logger\src\cinsim.cpp
-	"cinsim.h"
-
-1378262358 c:\program1\lfs_raceonaut-logger\src\cinsim.h
-	"insim.h"
-	<winsock2.h>
-	<stdio.h>
-	<string.h>
-	"pthread.h"
-	<stdio.h>
-	<pthread.h>
-	<limits.h>
-	<string.h>
-	<netdb.h>
-	<sys/types.h>
-	<netinet/in.h>
-	<sys/socket.h>
-	<arpa/inet.h>
-	<fstream>
-	<unistd.h>
-
-1378262358 c:\program1\lfs_raceonaut-logger\src\insim.h
-
-1378262927 c:\program1\lfs_raceonaut-logger\src\pthread.h
-	<windows.h>
-	"config.h"
-	<time.h>
-	<signal.h>
-	<setjmp.h>
-	<limits.h>
-	"need_errno.h"
-	<errno.h>
-	"sched.h"
-	<sys/types.h>
-
-1378262915 c:\program1\lfs_raceonaut-logger\src\sched.h
-	"need_errno.h"
-	<errno.h>
-	<sys/types.h>
-	<time.h>
-
-1387265907 source:c:\program1\lfs_raceonaut-logger\src\main.cpp
+1387423657 source:c:\program1\lfs_raceonaut-logger\src\main.cpp
 	<iostream>
 	<iostream>
 	<fstream>

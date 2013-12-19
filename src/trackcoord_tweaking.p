@@ -5,7 +5,10 @@ set key left top
 set title "blab blub blib" 
 
 set terminal png truecolor size 2560,2560
-set output "plot\\output.png"
+set output "plot\\tweak.png"
+set tics scale 1
+set xtics 50
+set ytics 50
 
 set size ratio 1
 set autoscale fix
