@@ -3,8 +3,8 @@ set terminal png truecolor size 480, 480
 set output "plot\\speedHistogram.png"
 
 
-n=65 #number of intervals
-max=320 #max value
+n=60 #number of intervals
+max=280 #max value
 min=0 #min value
 width=(max-min)/n #interval width
 #function used to map a value to the intervals

@@ -43,7 +43,7 @@ set key left top
 set key left top autotitle columnhead
 #set title "fuck"
 
-do for [i=0:15] {
+do for [i=0:11] {
 set key center top
 set key center top autotitle columnhead
 

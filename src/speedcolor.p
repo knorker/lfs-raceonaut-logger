@@ -9,13 +9,16 @@ set bmargin 0
 #set size ratio 1
 #set autoscale fix
 
-plotsize = 200
-set terminal png truecolor size plotsize,plotsize  *((yrangeMax-yrangeMin)/(xrangeMax-xrangeMin))
+#plotsize = 400
+#set terminal png truecolor size plotsize, plotsize  *  abs( (xrangeMax-xrangeMin)/ (yrangeMax-yrangeMin) )
+
+set terminal png truecolor size 2560,2560
 set output "plot\\output.png"
 
 
 set key top center autotitle columnhead
-set key font ",10"
+set key font ",15"
+set key textcolor rgb "white"
 
 #at top
 #set colorbox horizontal user origin 0.5, 0.94 size 0.4, 0.02
@@ -32,8 +35,13 @@ set palette defined (0 "black", 0.25 "blue", 0.5 "red", 0.75 "yellow", 0.95 "gre
 #plot 'KY.jpg' binary filetype=jpg center=(0,0) with rgbimage notitle,\
 #     'log12.txt' using 1:2:3 with lines palette
 
+bestlaplogfile = "log\\playerlogs\\log0.txt"
+bestlap = 39 -1
+
 plot trackimage binary filetype=jpg center=(0,0) with rgbimage notitle,\
-     'log\\output.txt' using 1:2:(0.4):3 with circles fillstyle transparent solid 0.5 palette title columnheader(1)
+     'log\\output.txt' using 1:2:(0.4):3 with circles fillstyle transparent solid 0.5 palette title columnheader(1) , \
+#	 bestlaplogfile using 1:2:($5 != bestlap ? 1/0 : $3) with linespoints palette linewidth 2 title columnheader(1) , \
+#	bestlaplogfile using 1:2:($5 != bestlap ? 1/0 : 0) with circles fillstyle transparent solid 0.5 palette title columnheader(1) , \
 
 
 #  the third value in (  ) (1.5) is the radius of the circles

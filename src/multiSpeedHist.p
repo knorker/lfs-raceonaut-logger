@@ -34,7 +34,7 @@ set key left top autotitle columnhead
 #set title "fuck"
 
 # WARUM GEHT AUTOTITLE NICHT? FIXME namen müssen über die plots!
-do for [i=0:23] {
+do for [i=0:11] {
 set key left top
 set key left top autotitle columnhead
 plot "log\\playerlogs\\log" .i. ".txt" u (hist($3,width)):(1.0) smooth freq w boxes lc rgb"green" notitle
