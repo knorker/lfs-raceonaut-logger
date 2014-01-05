@@ -1,11 +1,11 @@
 reset
-load "config.p"
-
+#load "config.p"
+trackimage="AS.jpg"
 set key left top
 set title "blab blub blib" 
 
-set terminal png truecolor size 2560,2560
-set output "plot\\tweak.png"
+set terminal png truecolor size 640,640
+set output "plot\\AStweak_coords.png"
 set tics scale 1
 set xtics 50
 set ytics 50
